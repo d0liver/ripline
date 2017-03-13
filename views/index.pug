@@ -1,0 +1,40 @@
+extends base
+block content
+	.section.tags-browser
+		.tag-section(draggable="true")
+			.tag-preview.tag-preview-special me
+			.tag-description.
+				This tag is the same as "user: <i>current user</i>". It is a
+				short way to search for only the snippets that belong to you
+				(the current user).
+
+		.tag-section(draggable="true" data-val="user: username")
+			.tag-preview.tag-preview-special user
+			.tag-description.
+				This tag allows you to search for snippets from a particular
+				user.
+
+		.tag-section(draggable="true")
+			.tag-preview.tag-preview-special recent
+			.tag-description.
+				This tag allows you to search for snippets that have been used
+				recently.
+
+		.tag-section(draggable="true")
+			.tag-preview.tag-preview-special all
+			.tag-description.
+				This tag allows you to search for snippets that have been used
+				recently.
+
+		.tag-section(draggable="true")
+			.tag-preview ssh-tunnel
+			.tag-description.
+				This tag allows you to search for snippets from a particular
+				user.
+
+	section.section.search
+		.logo
+			img(src="/ripline.svg" width="50")
+			h1 RipLine
+		input.typeahead(type="search" id="search" placeholder="Search Snippets..." incremental)
+		section(id="search-results")

@@ -1,0 +1,18 @@
+extends base
+block content
+	// This is currently just a copy of the suggestion.jade template. This isn't
+	// the most ideal solution but it will do until we find a better frontend
+	// templating solution (I don't really want this to be rendered on the frontend
+	// because it doesn't need to be but I also don't have a good way to access it
+	// through the backend either that I know of.)
+	mixin suggestion(snip)
+		.suggestion-wrapper
+			.suggestion-user=snip.user
+			a.suggestion-description(href="/view/"+snip._id target="_blank")= snip.description
+			.suggestion-interactions
+				a
+					span.rating 1,000
+					.fa.fa-star-o.suggestion-icon.star-small
+
+	each snip in snippets
+		+suggestion(snip)

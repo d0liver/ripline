@@ -1,0 +1,17 @@
+extends base
+block content
+	.small-container
+		h1.snip-title(contenteditable="true")=title
+		.tags-input-wrapper
+			span.tags-container
+			input.tags-input(type="text" placeholder="Tags separated by spaces..." value=tags)
+		pre.snippet-text
+			.controls
+				// Javascript handles copying this one to the clipboard
+				.paste-input
+					| Paste Snippet
+				.action-icons-wrapper
+					a(id="help").fa.fa-question.action-icon
+					a(id="copy").fa.fa-copy.action-icon
+					a(id="remove" href="/remove/"+_id).fa.fa-trash-o.action-icon
+			code= text

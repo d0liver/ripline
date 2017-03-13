@@ -1,0 +1,43 @@
+.suggestion
+	border-bottom: solid #e0e0e0 1px
+	border-spacing: 4px
+	cursor: pointer
+	display: table
+	height: 64px
+	margin: 0 auto
+	max-width: 640px
+	width: 100%
+
+%suggestion-item
+	display: table-cell !important
+	vertical-align: middle
+	white-space: nowrap
+
+.suggestion-icon
+	@extend %suggestion-item
+	color: rgba(0,0,0,0.5)
+	font-size: 25px !important
+	padding: 0 7px !important
+
+	&:hover
+		color: black
+
+.suggestion-interactions
+	@extend %suggestion-item
+
+.suggestion-user
+	@extend %suggestion-item
+	color: $tarawera
+	font: bold 16px/25px 'Open Sans'
+	padding: 0 10px
+
+.suggestion-description
+	@extend %suggestion-item
+	color: rgba(#000, 0.75)
+	line-height: 25px
+	padding-left: 10px
+	overflow: hidden
+	width: 100%
+
+.star-small
+	font-size: 22px !important

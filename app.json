@@ -1,0 +1,7 @@
+{
+  "name": "Ripline",
+  "description": "Snippets as first class citizens",
+  "repository": "https://github.com/d0liver/ripline",
+  "keywords": ["node", "express", "ripline"],
+  "image": "heroku/nodejs"
+}

@@ -1,0 +1,96 @@
+@import mixins
+@import vars
+@import reset
+
+@import confirm
+@import nav
+@import suggestion
+@import tags-browser
+@import typeahead
+@import view-snippet
+
+body
+	font-family: 'Open Sans'
+	font-size: 16px
+	margin: 0
+	padding: 0
+
+*
+	box-sizing: border-box
+
+.success
+	color: green
+	font-family: 'Open Sans'
+
+.container
+	background-color: white
+	margin: 0 auto
+	min-width: 400px
+
+.logo
+	width: 100%
+	max-width: 640px
+
+	h1
+		color: $tarawera
+		display: inline
+		font: 500 35px Orbitron
+		margin-left: 10px
+		vertical-align: bottom
+	img
+		height: 40px
+
+	text-align: center
+	margin: 0 auto 20px auto
+
+.big-button
+	background-color: #0b3c5d
+	border-radius: 10px
+	border: solid +darken(#0b3c5d, 50%) 2px
+	color: white
+	display: block
+	font-family: bebas_neuebold
+	font-size: em(25)
+	font-weight: bold
+	margin: 15px 0
+	padding: 10px
+	text-align: center
+	text-decoration: none
+	vertical-align: bottom
+	max-width: 250px
+
+.sep
+	// border-top: solid #d0d0d0 1px
+	height: 1px
+	margin: 100px 0 100px 0
+
+.description, .snippet
+	border-radius: 5px
+	border: solid #b0b0b0 1px
+	box-sizing: content-box
+	font-size: em(20)
+	height: 200px
+	margin: 15px 0
+	padding: 0 4px
+
+.search
+	box-sizing: border-box
+	float: right
+	margin-top: 100px
+	padding-left: em(50)
+	padding-right: em(50)
+	text-align: center
+	width: 61.6858%
+
+.small-container
+	margin: 0 auto
+	max-width: 1200px
+	clear: both
+
+@media (max-width: 1185px)
+
+	.section.tags-browser
+		display: none
+
+#search-results
+	padding-top: 30px
