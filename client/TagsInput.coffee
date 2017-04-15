@@ -35,8 +35,7 @@ TagsInput = (save) ->
 				tags.push $(v).text()
 
 			save {tags}
-			.always (r) ->
-				console.log "Result: ", r
+
 		else inited = true
 
 		return

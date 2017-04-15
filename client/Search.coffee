@@ -22,7 +22,7 @@ class Search
 
 		# Bail if we don't have a search value currently
 		gqlQuery """
-			query search($text: String){
+			query search($text: String!){
 				snippets(text: $text) {
 					_id
 					title

@@ -50,10 +50,11 @@ app.use express.static 'public'
 
 co ->
 	db = yield MongoClient.connect DB_URI
-	schema = SchemaBuilder db
+	{schema, rootValue} = SchemaBuilder db
 
 	app.use '/graphql', graphql_http
 	  schema: schema
+	  rootValue: rootValue
 	  graphiql: true
 
 	snippets = db.collection 'snippets'

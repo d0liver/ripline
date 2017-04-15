@@ -1,63 +1,75 @@
 {ObjectID} = require 'mongodb'
+{buildSchema} = require 'graphql'
 
 SchemaBuilder = (db) ->
-	{
-		# These are the basic GraphQL types
-		GraphQLInt
-		GraphQLFloat
-		GraphQLString
-		GraphQLList
-		GraphQLObjectType
-		GraphQLEnumType
 
-		# This is used to create required fields and arguments
-		GraphQLNonNull
+	snippets = db.collection 'snippets'
 
-		# This is the class we need to create the schema
-		GraphQLSchema
+	schema = buildSchema """
+		type Snippet {
+			_id: String
+			text: String
+			title: String
+			uid: String
+		}
 
-		# This function is used execute GraphQL queries
-		graphql
-	} = require 'graphql'
+		type Query {
+			snippet(_id: String!): Snippet
+			snippets(text: String!): [Snippet]
+		}
 
-	Snippet = new GraphQLObjectType
-		name: 'Snippet'
-		description: 'This represents a snippet.',
-		fields: ->
-			_id: type: GraphQLString
-			title: type: GraphQLString
-			text: type: GraphQLString
-			description: type: GraphQLString
+		input SnippetPartial {
+			title: String
+			text: String
+			tags: [String]
+		}
 
-	Query = new GraphQLObjectType
-		name: 'RiplineSchema',
-		description: 'Root schema for ripline',
-		fields: ->
-			snippet:
-				type: Snippet
-				description: 'Get snippet info'
-				args: _id: type: new GraphQLNonNull GraphQLString
-				resolve: (root, {_id}) ->
-					try
-						_id = ObjectID _id
-						return db.collection('snippets').findOne {_id}
-					catch err
-						return errors: [message: 'Invalid id']
-			snippets:
-				type: new GraphQLList Snippet
-				description: 'Search snippets'
-				args: text: type: GraphQLString
-				resolve: (root, {text}) ->
-					if text is 'all'
-						search = {}
-					else
-						pieces = text.split /\s+/
-						exprs = for piece in pieces
-							tags: $regex: "#{piece}"
-						search = $and: exprs
+		type Mutation {
+			updateSnippet(update: SnippetPartial!, _id: String!): Boolean
+			removeSnippet(_id: String!): Boolean
+		}
+	"""
 
-					db.collection('snippets').find(search).toArray()
+	rootValue =
+		snippet: ({_id}) ->
+			try
+				_id = ObjectID _id
+				return snippets.findOne {_id}
+			catch err
+				throw new Exception 'Invalid snippet _id'
 
-	return new GraphQLSchema query: Query
+		snippets: ({text}) ->
+			if text is 'all'
+				search = {}
+			else
+				pieces = text.split /\s+/
+				exprs = for piece in pieces
+					tags: $regex: "#{piece}"
+				search = $and: exprs
+			snippets.find(search).toArray()
+
+		updateSnippet: ({_id, update}) ->
+			try
+				_id = ObjectID _id
+			catch err
+				throw new Exception 'Invalid snippet _id'
+
+			mongo_update = $set: {}
+			for key, value of update
+				mongo_update.$set[key] = value
+
+			snippets.updateOne({_id}, mongo_update)
+			.then (r) ->
+				true
+
+		removeSnippet: ({_id}) ->
+			try
+				_id = ObjectID _id
+			catch err
+				throw new Excpetion 'Invalid snippet _id.'
+
+			snippets.remove({_id})
+
+	return {schema, rootValue}
 
 module.exports = SchemaBuilder

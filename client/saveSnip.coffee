@@ -1,11 +1,14 @@
-$ = require "jquery"
-_ = require "underscore"
+$        = require "jquery"
+_        = require "underscore"
+gqlQuery = require "./gqlQuery"
 
-saveSnip = (updates) ->
-	console.log "Save snip: ", updates
-	data = _.extendOwn _id: snipID(), updates
-	console.log "Data: ", data
-	$.post '/submit', data
+saveSnip = (update) ->
+	_id = snipID()
+	gqlQuery """
+		mutation updateSnippet($update: SnippetPartial!, $_id: String!) {
+			updateSnippet(update: $update, _id: $_id)
+		}
+	""", {update, _id}
 
 snipID = -> window.location.href.split("/")[-1..-1][0]
 
