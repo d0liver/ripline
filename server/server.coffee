@@ -27,6 +27,7 @@ MONGODB_URI ?= 'mongodb://localhost:27017/ripline'
 # Local Dependencies
 SchemaBuilder      = require './schema'
 configGoogleAuth   = require './configGoogleAuth'
+configGitHubAuth   = require './configGitHubAuth'
 
 # Express Middleware and Initialization
 app  = express()
@@ -52,9 +53,16 @@ co ->
 	db = yield MongoClient.connect MONGODB_URI
 	snippets = db.collection 'snippets'
 
-	configGoogleAuth {app, db, passport}
+	# Disabled, maybe forever. Auth with github is more desirable.
+	# configGoogleAuth {app, db, passport}
+	configGitHubAuth {app, db, passport}
 
-	app.use '/graphql', graphqlExpress schema: SchemaBuilder db
+	app.use '/graphql', graphqlExpress (req) ->
+		obj = schema: SchemaBuilder {db, user: req.user}
+		if NODE_ENV is 'production'
+			_.extendOwn obj, 
+				formatError: -> 'An internal error occurred.' 
+		return obj
 
 	app.get '/', (req, res) ->
 		res.redirect "/search"

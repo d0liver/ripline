@@ -27,6 +27,7 @@ class Search
 					_id
 					title
 					text
+					username
 				}
 			}
 		""", {text}

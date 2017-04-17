@@ -1,8 +1,9 @@
 {ObjectID}             = require 'mongodb'
 {GraphQLScalarType}    = require 'graphql'
 {makeExecutableSchema} = require 'graphql-tools'
+co                     = require 'co'
 
-SchemaBuilder = (db, user) ->
+SchemaBuilder = ({db, user}) ->
 
 	snippets = db.collection 'snippets'
 	MongoObjectID = new GraphQLScalarType
@@ -20,7 +21,7 @@ SchemaBuilder = (db, user) ->
 			_id: ObjectID
 			text: String
 			title: String
-			user: String
+			username: String
 		}
 
 		type Query {
