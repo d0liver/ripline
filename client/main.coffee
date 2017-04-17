@@ -37,6 +37,10 @@ $ ->
 		new PasteSnippet save
 
 		snipID = -> window.location.href.split("/")[-1..-1][0]
+		$('#title').on 'keyup', ->
+			console.log "Saving..."
+			save title: $(@).text()
+
 		$('#remove').click -> 
 			gqlQuery """
 				mutation removeSnippet($_id: ObjectID!) {

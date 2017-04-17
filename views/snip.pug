@@ -1,7 +1,7 @@
 extends base
 block content
 	.small-container
-		h1.snip-title(contenteditable="true")=title
+		h1.snip-title(id="title" contenteditable="true")=title
 		.tags-input-wrapper
 			span.tags-container
 			input.tags-input(type="text" placeholder="Tags separated by spaces..." value=tags)
