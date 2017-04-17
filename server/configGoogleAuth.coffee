@@ -31,5 +31,5 @@ module.exports = co.wrap ({app, passport, db}) ->
 	failureRedirect = '/'
 	app.get '/auth/google/callback', auth({failureRedirect}), (req, res) ->
 		# Authentication was successful
-		res.redirect req.session.redirect
+		res.redirect req.session.redirect ? '/'
 		delete req.session.redirect
