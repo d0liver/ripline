@@ -23,7 +23,6 @@ $ ->
 	$copy.click -> clipboard.copy $(@).data 'text'
 
 	router.get '/search': ->
-		console.log "Index route"
 		search = new Search()
 
 		# Allows us to drag and drop tags into the search
@@ -40,7 +39,7 @@ $ ->
 		snipID = -> window.location.href.split("/")[-1..-1][0]
 		$('#remove').click -> 
 			gqlQuery """
-				mutation removeSnippet($_id: String!) {
+				mutation removeSnippet($_id: ObjectID!) {
 					removeSnippet(_id: $_id)
 				}
 			""", {_id: snipID()}
