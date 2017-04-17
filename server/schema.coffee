@@ -37,8 +37,8 @@ SchemaBuilder = ({db, user}) ->
 
 		type Mutation {
 			updateSnippet(update: SnippetPartial!, _id: ObjectID!): Boolean
+			forkSnippet(_id: ObjectID!): ObjectID
 			removeSnippet(_id: ObjectID!): Boolean
-			createSnippet: Boolean
 		}
 	"""
 
@@ -60,14 +60,15 @@ SchemaBuilder = ({db, user}) ->
 		Mutation:
 			# Fork an existing snippet by copying it under the current user.
 			# TODO: Make sure the user is logged in here.
-			createSnippet: (obj, {_id})->
-				co ->
-					template_id = ObjectID '58d9e8296331a801d90ce6c6'
-					template = yield snippets.findOne _id: template_id
+			forkSnippet: (obj, {_id}) ->
+				return null unless user?
+				snippets.findOne {_id}, _id: 0
+				.then (template) ->
 					template.user = user.displayName
-					delete template._id
-					{insertedId} = yield snippets.insertOne template
-					return insertedId
+					console.log "Display name: ", user.displayName
+					console.log "Inserting template: ", template
+					snippets.insertOne template
+				.then ({insertedId}) -> insertedId
 
 			updateSnippet: (obj, {_id, update}) ->
 

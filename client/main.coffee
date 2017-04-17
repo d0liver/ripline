@@ -45,4 +45,17 @@ $ ->
 			""", {_id: snipID()}
 			.done -> window.location.replace '/'
 
+		$('#fork').click ->
+			console.log "Kickoff!"
+			gqlQuery """
+				mutation forkSnippet($_id: ObjectID!) {
+					forkSnippet(_id: $_id)
+				}
+			""", {_id: snipID()}
+			.done (result)->
+				if result.data.forkSnippet?
+					window.location.replace "/view/#{result.data.forkSnippet}"
+				else
+					window.location.replace '/auth/github'
+
 	router.route()
