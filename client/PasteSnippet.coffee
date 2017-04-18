@@ -27,7 +27,7 @@ class PasteSnippet
 					$checkmark.animate opacity: 0, 2000
 
 					# Set the new code and force hilight js to reinit
-					$code.html val
+					$code.text val
 					hljs.initHighlighting.called = false
 					hljs.initHighlighting()
 
