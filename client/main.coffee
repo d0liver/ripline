@@ -11,6 +11,7 @@ PasteSnippet = require './PasteSnippet'
 save         = require './saveSnip'
 Router       = require './Router'
 gqlQuery     = require './gqlQuery'
+tag_template = require '../views/tag.jade'
 
 $ ->
 	hljs.initHighlightingOnLoad()
@@ -23,6 +24,16 @@ $ ->
 	$copy.click -> clipboard.copy $(@).data 'text'
 
 	router.get '/search': ->
+		gqlQuery """
+			{
+				tags
+			}
+		"""
+		.done ({data: {tags}}) ->
+			$tags_browser = $ '.tags-browser'
+			for tag in tags
+				$tags_browser.append tag_template {tag}
+
 		search = new Search()
 
 		# Allows us to drag and drop tags into the search
@@ -48,6 +59,9 @@ $ ->
 				}
 			""", {_id: snipID()}
 			.done -> window.location.replace '/'
+
+		$('#copy').click ->
+			clipboard.copy $('code').text()
 
 		$('#fork').click ->
 			console.log "Kickoff!"

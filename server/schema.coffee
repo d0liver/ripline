@@ -2,6 +2,11 @@
 {GraphQLScalarType}    = require 'graphql'
 {makeExecutableSchema} = require 'graphql-tools'
 co                     = require 'co'
+_                      = require 'underscore'
+
+# Just hardcoding this for now. It's probably not necessary to give the query
+# control over the page size.
+PAGE_SIZE=5
 
 SchemaBuilder = ({db, user}) ->
 
@@ -26,7 +31,10 @@ SchemaBuilder = ({db, user}) ->
 
 		type Query {
 			snippet(_id: ObjectID!): Snippet
-			snippets(text: String!): [Snippet]
+			snippets(text: String!, page: Int): [Snippet]
+			snippetsCount(text: String!): Int
+			username: String
+			tags: [String!]
 		}
 
 		input SnippetPartial {
@@ -42,20 +50,51 @@ SchemaBuilder = ({db, user}) ->
 		}
 	"""
 
+	search = (text, page) ->
+		if text is 'all'
+			search = {}
+		else
+			exprs = []
+			tags = []
+			pieces = text.split /\s+/
+			# Special search have the form key: value.
+			while (piece = pieces.shift())?
+				if piece is 'username:'
+					next_piece = pieces.shift().trim()
+					if next_piece isnt ''
+						exprs.push username: next_piece
+				else
+					tags.push piece
+
+			for piece in tags
+				exprs.push tags: $regex: new RegExp piece, 'i'
+			search = $and: exprs
+
+		snippets.find(search)
+
 	resolvers =
 		ObjectID: MongoObjectID
 		Query:
-			snippet: ({_id}) -> snippets.findOne {_id}
+			username: -> user?.username 
+			snippet: (obj, {_id}) -> snippets.findOne {_id}
+			tags: (obj) ->
+				pipeline = [
+					{$project: tags: 1, _id: 0}
+					{$unwind: '$tags'}
+					{$group: _id: '$tags'}
+				]
+				snippets.aggregate(pipeline).sort(_id: 1).toArray().then (results) ->
+					for result in results
+						result._id
 
-			snippets: (obj, {text}) ->
-				if text is 'all'
-					search = {}
-				else
-					pieces = text.split /\s+/
-					exprs = for piece in pieces
-						tags: $regex: "#{piece}"
-					search = $and: exprs
-				snippets.find(search).toArray()
+			# Page is zero indexed. When count is true we return the page count
+			# only. This way we don't query for the page count with each search
+			# request - it's just stored by the client.
+			snippets: (obj, {text, page = 0}) ->
+				search(text, page).skip(page*PAGE_SIZE).limit(PAGE_SIZE).toArray()
+
+			snippetsCount: (obj, {text}) ->
+				search(text).count()
 
 		Mutation:
 			# Fork an existing snippet by copying it under the current user.
@@ -64,24 +103,23 @@ SchemaBuilder = ({db, user}) ->
 				return null unless user?
 				snippets.findOne {_id}, _id: 0
 				.then (template) ->
-					template.user = user.displayName
-					console.log "Display name: ", user.displayName
-					console.log "Inserting template: ", template
+					template.user = user.username
 					snippets.insertOne template
 				.then ({insertedId}) -> insertedId
 
 			updateSnippet: (obj, {_id, update}) ->
-
+				return null unless user?
 				mongo_update = $set: {}
 				for key, value of update
 					mongo_update.$set[key] = value
 
-				snippets.updateOne({_id}, mongo_update)
+				snippets.updateOne({_id, username: user.username}, mongo_update)
 				.then (r) ->
 					true
 
 			removeSnippet: (obj, {_id}) ->
-				snippets.remove({_id})
+				return null unless user?
+				snippets.remove({_id, username: user.username})
 
 	return makeExecutableSchema {typeDefs: schema, resolvers}
 

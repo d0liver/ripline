@@ -1,30 +1,31 @@
 extends base
 block content
 	.section.tags-browser
-		.tag-section(draggable="true")
-			.tag-preview.tag-preview-special me
-			.tag-description.
-				This tag is the same as "user: <i>current user</i>". It is a
-				short way to search for only the snippets that belong to you
-				(the current user).
+		if user
+			.tag-section(draggable="true")
+				.tag-preview.tag-preview-special my
+				.tag-description.
+					This tag is the same as "user: <i>current user</i>". It is a
+					short way to search for only the snippets that belong to you
+					(the current user).
 
-		.tag-section(draggable="true" data-val="user: username")
+		.tag-section(draggable="true" data-val="username: username")
 			.tag-preview.tag-preview-special user
 			.tag-description.
 				This tag allows you to search for snippets from a particular
 				user.
 
-		.tag-section(draggable="true")
-			.tag-preview.tag-preview-special recent
-			.tag-description.
-				This tag allows you to search for snippets that have been used
-				recently.
+		// Not ready to add this yet
+		// .tag-section(draggable="true")
+		// 	.tag-preview.tag-preview-special recent
+		// 	.tag-description.
+		// 		This tag allows you to search for snippets that have been used
+		// 		recently.
 
 		.tag-section(draggable="true")
 			.tag-preview.tag-preview-special all
 			.tag-description.
-				This tag allows you to search for snippets that have been used
-				recently.
+				This tag allows you to page through ALL snippets.
 
 		.tag-section(draggable="true")
 			.tag-preview ssh-tunnel
@@ -38,3 +39,4 @@ block content
 			h1 RipLine
 		input.typeahead(type="search" id="search" placeholder="Search Snippets..." incremental)
 		section(id="search-results")
+		.pagination-container

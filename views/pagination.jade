@@ -1,0 +1,6 @@
+if current_page != 0
+	a.page-button.page-button-previous(href='javascript:;' data-page='previous') Previous
+- for (var i = 0; i < count; ++i)
+	a.page-button(href='javascript:;' data-page=i)=i+1
+if current_page < count - 1
+	a.page-button.page-button-next(href='javascript:;' data-page='next') Next

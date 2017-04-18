@@ -1,18 +1,23 @@
 extends base
 block content
 	.small-container
-		h1.snip-title(id="title" contenteditable="true")=title
+		if owner
+			h1.snip-title(id="title" contenteditable="true")=title
+		else
+			h1.snip-title(id="title")=title
 		.tags-input-wrapper
 			span.tags-container
 			input.tags-input(type="text" placeholder="Tags separated by spaces..." value=tags)
 		pre.snippet-text
 			.controls
 				// Javascript handles copying this one to the clipboard
-				.paste-input
-					| Paste Snippet
+				if owner
+					.paste-input
+						| Paste Snippet
 				.action-icons-wrapper
 					a(id="help").fa.fa-question.action-icon
-					a(id="fork").fa.fa-code-fork.action-icon
 					a(id="copy").fa.fa-copy.action-icon
-					a(id="remove").fa.fa-trash-o.action-icon
+					if owner
+						a(id="fork").fa.fa-code-fork.action-icon
+						a(id="remove").fa.fa-trash-o.action-icon
 			code= text

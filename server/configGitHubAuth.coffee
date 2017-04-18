@@ -6,7 +6,6 @@ co                         = require 'co'
 module.exports = co.wrap ({app, passport, db}) ->
 	credentials = yield CredentialsManager().fetch 'GitHub'
 
-	console.log "Credentials: ", credentials
 	opts = _.extendOwn credentials,
 		callbackURL: "http://localhost:8080/auth/github/callback"
 
@@ -16,6 +15,7 @@ module.exports = co.wrap ({app, passport, db}) ->
 	passport.use new GitHubStrategy opts, verify
 
 	scope = ['user:email']
+
 	app.get '/auth/github', passport.authenticate 'github', scope
 
 	failureRedirect = '/'

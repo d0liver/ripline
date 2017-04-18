@@ -1,50 +1,67 @@
 _           = require "underscore"
-gulp        = require 'gulp'
-{log}       = require 'gulp-util'
-{exec}      = require 'child_process'
-ctags       = require 'gulp-ctags'
 browserSync = require 'browser-sync'
+ctags       = require 'gulp-ctags'
+gulp        = require 'gulp'
 nodemon     = require 'gulp-nodemon'
+{exec}      = require 'child_process'
+{log}       = require 'gulp-util'
 
 # Browserify stuff
-watchify   = require 'watchify'
+_          = require 'underscore'
 browserify = require 'browserify'
-source     = require 'vinyl-source-stream'
 buffer     = require 'vinyl-buffer'
-gutil      = require 'gulp-util'
 coffee     = require 'gulp-coffee'
-sourcemaps = require 'gulp-sourcemaps'
 rename     = require "gulp-rename"
 sass       = require "gulp-sass"
+source     = require 'vinyl-source-stream'
+sourcemaps = require 'gulp-sourcemaps'
 uglify     = require "gulp-uglify"
-_          = require 'underscore'
+watchify   = require 'watchify'
 
-browserSync = browserSync.create()
+gulp.task 'dev-bundle', ->
 
-bundle = ->
-	b.bundle()
+	bundle = ->
+		b.bundle()
+		.on 'error', log
+		.pipe source 'bundle.js'
+		.pipe buffer()
+		.pipe sourcemaps.init loadMaps: true, debug: true
+		# .pipe uglify debug: true, options: sourceMap: true
+		.pipe sourcemaps.write './'
+		.pipe gulp.dest 'public/'
+
+	opts =
+		entries: ['client/main.coffee']
+		debug: true
+		cache: {},
+		packageCache: {},
+		plugin: [require "watchify"]
+		extensions: ['.coffee']
+
+	b = browserify opts
+	b.transform require "coffeeify", {bare: true, header: false}
+	b.transform require 'jadeify'
+	b.on 'log', log
+	b.on 'update', bundle
+	bundle()
+
+gulp.task 'compile-client', ->
+	opts =
+		entries: ['client/main.coffee']
+		extensions: ['.coffee']
+
+	prod_b = browserify opts
+	prod_b.transform require "coffeeify", {bare: true, header: false}
+	prod_b.transform require 'jadeify'
+	prod_b.on 'log', log
+
+	prod_b.bundle()
 	.on 'error', log
 	.pipe source 'bundle.js'
 	.pipe buffer()
-	.pipe sourcemaps.init loadMaps: true, debug: true
-	# .pipe uglify debug: true, options: sourceMap: true
-	.pipe sourcemaps.write './'
+	# .pipe sourcemaps.init loadMaps: true, debug: true
+	.pipe uglify()
 	.pipe gulp.dest 'public/'
-
-opts =
-	entries: ['client/main.coffee']
-	debug: true
-	cache: {},
-	packageCache: {},
-	plugin: [require "watchify"]
-	extensions: ['.coffee']
-b = browserify opts
-b.transform require "coffeeify", {bare: true, header: false}
-b.transform require 'jadeify'
-b.on 'log', log
-b.on 'update', bundle
-
-gulp.task 'bundle', bundle
 
 gulp.task 'sass', ->
 	gulp.src "sass/**/*.sass"
@@ -54,8 +71,8 @@ gulp.task 'sass', ->
 	.pipe gulp.dest "./public/"
 	.pipe browserSync.stream()
 
-gulp.task 'default', ['sass', 'bundle', 'server'], ->
-	bundle()
+gulp.task 'default', ['sass', 'server', 'dev-bundle'], ->
+	browserSync = browserSync.create()
 	browserSync.init
 		proxy:
 			target: "localhost:3000"
@@ -67,6 +84,8 @@ gulp.task 'default', ['sass', 'bundle', 'server'], ->
 		.on 'change', browserSync.reload
 	gulp.watch 'public/bundle.js'
 		.on 'change', browserSync.reload
+
+gulp.task 'prod-build', ['sass', 'compile-server', 'compile-client']
 
 gulp.task 'compile-server', ->
 	gulp.src './server/*.coffee'

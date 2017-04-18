@@ -21,5 +21,10 @@ html
 
 		.container
 			.main-nav
+				a(href="/") Search
 				a(href="https://www.github.com/d0liver/ripline") GitHub
+				if !user
+					a(href="/auth/github") Log In
+				else
+					a(href='/logout') Log Out
 			block content

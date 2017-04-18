@@ -49,6 +49,12 @@ app.use bodyParser.json()
 
 app.use express.static 'public'
 
+# Add the user to the locals for use in templates.
+app.use (req, res, next) ->
+	if req.isAuthenticated()
+		res.locals.user = req.user
+	next()
+
 co ->
 	db = yield MongoClient.connect MONGODB_URI
 	snippets = db.collection 'snippets'
@@ -67,6 +73,10 @@ co ->
 	app.get '/', (req, res) ->
 		res.redirect "/search"
 
+	app.get '/logout', (req, res) ->
+		req.logOut()
+		res.redirect '/'
+
 	app.get '/search', (req, res) ->
 		res.render 'index'
 
@@ -76,6 +86,7 @@ co ->
 			_id = ObjectID req.params._id
 			snip = yield snippets.findOne {_id}
 			snip.tags = snip.tags.join ' '
+			snip.owner = req.isAuthenticated() and snip.username is req.user.username
 			res.render 'snip', snip
 
 	pass = (user, done) -> done null, user

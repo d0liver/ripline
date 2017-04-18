@@ -28,6 +28,14 @@ TagsInput = (save) ->
 		reinit()
 		$tags_input.val ''
 
+		# TODO: This is a pretty bad hack and needs to be fixed but it will get
+		# things working for now (some redesign is needed). On the initial page
+		# load if the title is not editable then we assume the user is not
+		# logged in and remove the input field for the tags so they cannot be
+		# edited either.
+		if not inited and $('.snip-title').attr('contenteditable') isnt 'true'
+			$('.tags-input').remove()
+
 		# Save the new tags if this isn't the initial load
 		if inited
 			tags = []

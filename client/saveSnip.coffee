@@ -5,7 +5,7 @@ gqlQuery = require "./gqlQuery"
 saveSnip = (update) ->
 	_id = snipID()
 	gqlQuery """
-		mutation updateSnippet($update: SnippetPartial!, $_id: String!) {
+		mutation updateSnippet($update: SnippetPartial!, $_id: ObjectID!) {
 			updateSnippet(update: $update, _id: $_id)
 		}
 	""", {update, _id}
