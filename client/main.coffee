@@ -14,8 +14,6 @@ gqlQuery     = require './gqlQuery'
 tag_template = require '../views/tag.jade'
 
 $ ->
-	hljs.initHighlightingOnLoad()
-
 	# Drives the snippet search
 	router = Router()
 
@@ -40,6 +38,7 @@ $ ->
 		new DragTags search
 
 	router.get '/view/:_id': ({_id}) ->
+		hljs.highlightBlock $('pre.snippet-text code')[0]
 		# Drives the tags input on the add snippet page
 		TagsInput save
 

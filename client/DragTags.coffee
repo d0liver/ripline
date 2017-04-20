@@ -25,6 +25,7 @@ class DragTags
 	constructor: (search) ->
 		$('.tags-browser').on 'dragstart', '.tag-section', (e) ->
 			$tag = $(@)
+			e.originalEvent.dataTransfer.setData 'text/plain', 'anything'
 			tag_text = if $tag.data('val')?
 				$tag.data 'val'
 			else
@@ -58,19 +59,23 @@ class DragTags
 
 					tag_text = "username: #{result.data.username}"
 					$this.val "#{val}#{tag_text}"
-					search.refresh()
+					$this.trigger 'change'
 			else if 'all' in [tag_text, val]
 				$this.val tag_text
-				search.refresh()
+				$this.trigger 'change'
 			else
 				$this.val "#{val}#{tag_text}"
 				selectPlaceholder $this[0], tag_text
-				search.refresh()
+				$this.trigger 'change'
 
-		$('#search').on 'dragenter', (e) -> e.preventDefault()
+		$('#search').on 'dragenter', (e) ->
+			e.preventDefault()
 
-		$('#search').on 'dragover', (e) -> e.preventDefault()
+		$('#search').on 'dragover', (e) ->
+			e.preventDefault()
 
+	window.foo = ->
+		console.log "TEST"
 	# Select a range on the $input field given
 	select = (input, start, end) ->
 		input.focus()

@@ -16,12 +16,40 @@ class Search
 	$search = null; $search_results = null
 	page_count = null; current_page = 0
 	text = null
+	$clear = null
+
+	addClearTextButton = ($search) ->
+		$wrapper = $ '<div></div>'
+		$wrapper.css position: 'relative', display: 'inline'
+		$search.wrap $wrapper
+		$clear = $ '<span class="fa fa-times"></span>'
+		.css
+			'font-size': 20
+			position: 'absolute'
+			right: 20, top: 0
+			display: 'none'
+			cursor: 'pointer'
+
+		$clear.click (e) ->
+			$search.val ''
+			$search.trigger 'change'
+			$search.focus()
+
+		$search.after $clear
 
 	constructor: ->
+		# type='search' doesn't do the right thing in FF so we add our own
+		# clear text button.
 		$search = $ '#search'
 		$search_results = $ '#search-results'
-		$search.on 'search', => @refresh()
+
+		addClearTextButton $search
+
+		$search.on 'change keyup', =>
+			@refresh()
+
 		showPage = @showPage
+
 
 		$('.search').on 'click', '.page-button', (e) ->
 			new_page = $(@).data 'page'
@@ -36,9 +64,12 @@ class Search
 			showPage page_num
 
 	refresh: ->
+		# Bail if nothing has changed.
+		return if text is $search.val()
 		$search_results.html ''; $('.pagination-container').html ''
 		current_page = 0
 		text = $search.val()
+		$clear.css display: if text is '' then 'none' else 'inline'
 		# Bail if we don't have a search value currently
 		if text is '' then return
 
@@ -53,7 +84,6 @@ class Search
 
 	showPage: (page_num) ->
 		current_page = page_num
-		$search_results.html ''
 
 		# We have to redisplay the pagination controls each time we load a new
 		# page because the 'Next' and 'Previous' buttons disappear when they
@@ -76,6 +106,7 @@ class Search
 			}
 		""", {text, page: page_num}
 		.done ({data: snippets: results}) ->
+			$search_results.html ''
 			for result in results
 				$search_results.append suggestion_template result
 
