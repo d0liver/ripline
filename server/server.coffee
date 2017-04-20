@@ -53,6 +53,11 @@ app.use express.static 'public'
 app.use (req, res, next) ->
 	if req.isAuthenticated()
 		res.locals.user = req.user
+
+	{protocol, originalUrl: uri} = req
+	host = req.get 'host'
+	res.locals.currentUri = encodeURI "#{protocol}://#{host}#{uri}"
+
 	next()
 
 co ->
@@ -71,7 +76,7 @@ co ->
 		return obj
 
 	app.get '/', (req, res) ->
-		res.redirect "/search"
+		res.redirect '/search'
 
 	app.get '/logout', (req, res) ->
 		req.logOut()

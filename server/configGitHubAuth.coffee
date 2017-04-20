@@ -20,13 +20,23 @@ module.exports = co.wrap ({app, passport, db}) ->
 
 	scope = ['user:email']
 
-	app.get '/auth/github', passport.authenticate 'github', scope
+	app.get '/auth/github',
+		(req, res, next) ->
+			req.session.return = req.query.return if req.query.return
+			next()
+		, passport.authenticate 'github', scope
 
 	failureRedirect = '/'
 	app.get \
 		'/auth/github/callback',
 		passport.authenticate('github', {failureRedirect}),
 		(req, res) ->
-			# Successful authentication, redirect home.
-			res.redirect '/'
+			# Successful authentication, return to page (or home).
+			redir = if req.session.return
+				req.session.return
+			else
+				'/'
+			delete req.session.return
+
+			res.redirect redir
 
