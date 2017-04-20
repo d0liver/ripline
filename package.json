@@ -48,15 +48,15 @@
     "vinyl-source-stream": "^1.1.0",
     "watchify": "^3.8.0"
   },
-  "description": "Community oriented social media",
+  "description": "Snippets as first class citizens.",
   "devDependencies": {},
   "keywords": [],
   "license": "ISC",
   "main": "server.js",
-  "name": "Warren",
+  "name": "RipLine",
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@bitbucket.org/d0liver/warren.git"
+    "url": "git+ssh://git@bitbucket.org/d0liver/ripline.git"
   },
   "scripts": {
     "postinstall": "node node_modules/gulp/bin/gulp prod-build",
