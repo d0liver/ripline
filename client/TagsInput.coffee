@@ -17,7 +17,9 @@ TagsInput = (save) ->
 		new_tags = $tags_input.val().split " "
 
 		for tag in new_tags when tag isnt ''
-			$elem = $ "<span class='tag'>#{tag}</span>"
+			$elem = $ "<span class='tag'></span>"
+			# Prevent injections by doing this in a separate step
+			$elem.text tag
 			$delete_button = $ "<span class='fa fa-times delete-tag'></span>"
 			$delete_button.click ->
 				$(@).parent().remove()
