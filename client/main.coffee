@@ -22,6 +22,12 @@ $ ->
 	$copy.click -> clipboard.copy $(@).data 'text'
 
 	router.get '/search': ->
+		search = new Search()
+
+		# Allows us to drag and drop tags into the search
+		new DragTags search
+
+		$('#search').focus()
 		gqlQuery """
 			{
 				tags
@@ -31,11 +37,6 @@ $ ->
 			$tags_browser = $ '.tags-browser'
 			for tag in tags
 				$tags_browser.append tag_template {tag}
-
-		search = new Search()
-
-		# Allows us to drag and drop tags into the search
-		new DragTags search
 
 	router.get '/view/:_id': ({_id}) ->
 		hljs.highlightBlock $('pre.snippet-text code')[0]
