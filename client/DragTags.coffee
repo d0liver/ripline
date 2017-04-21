@@ -23,7 +23,7 @@ class DragTags
 			select input, startpos, endpos
 
 	constructor: (search) ->
-		$('.tags-browser').on 'dragstart', '.tag-section', (e) ->
+		$('.tags-browser').on 'dragstart', '.tag-section,.tag-preview', (e) ->
 			$tag = $(@)
 			e.originalEvent.dataTransfer.setData 'text/plain', 'anything'
 			tag_text = if $tag.data('val')?
