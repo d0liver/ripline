@@ -10,7 +10,6 @@ nodemon     = require 'gulp-nodemon'
 _          = require 'underscore'
 browserify = require 'browserify'
 buffer     = require 'vinyl-buffer'
-coffee     = require 'gulp-coffee'
 rename     = require "gulp-rename"
 sass       = require "gulp-sass"
 source     = require 'vinyl-source-stream'
@@ -69,21 +68,10 @@ gulp.task 'sass', ->
 	.pipe sass().on "error", log
 	.pipe sourcemaps.write '.'
 	.pipe gulp.dest "./public/"
-	.pipe browserSync.stream()
 
 gulp.task 'default', ['sass', 'server', 'dev-bundle'], ->
-	browserSync = browserSync.create()
-	browserSync.init
-		proxy:
-			target: "localhost:3000"
-		port: 8080
-
 	gulp.watch 'sass/**/*.sass', ['sass']
 	gulp.watch '**/*.coffee', ['coffee-tags']
-	gulp.watch 'views/*.pug'
-		.on 'change', browserSync.reload
-	gulp.watch 'public/bundle.js'
-		.on 'change', browserSync.reload
 
 gulp.task 'prod-build', ['sass', 'compile-server', 'compile-client']
 
@@ -103,15 +91,7 @@ gulp.task 'coffee-lint', ->
 gulp.task 'server', ->
 	stream = nodemon
 		script: 'server/server.coffee'
+		ignoreRoot: []
 		watch: ['server/*.coffee', 'lib/*.coffee']
 		ext: 'coffee'
-		env: 'NODE_ENV': 'development'
-
-	stream
-		# Force browser reload after server restart.
-		.on 'start', -> setTimeout browserSync.reload, 1000
-		.on 'crash', ->
-			console.log 'Application crashed'
-			stream.emit 'restart', 1
-		.on 'restart', ->
-			console.log 'Application restarted'
+		env: NODE_ENV: 'development'

@@ -1,20 +1,22 @@
 {Strategy: GitHubStrategy} = require 'passport-github2'
 CredentialsManager         = require './CredentialsManager'
-_                          = require 'underscore'
 co                         = require 'co'
 
 module.exports = co.wrap ({app, passport, db}) ->
 	credentials = yield CredentialsManager().fetch 'GitHub'
 
 	if process.env.NODE_ENV is 'development'
-		opts = _.extendOwn credentials,
-			callbackURL: "http://localhost:8080/auth/github/callback"
+		opts = Object.assign credentials,
+			callbackURL: "http://localhost:3000/auth/github/callback"
 	else
-		opts = _.extendOwn credentials,
+		opts = Object.assign credentials,
 			callbackURL: "/auth/github/callback"
 
 	verify = (accessToken, refreshToken, profile, done) ->
-		done null, profile
+		if profile.username is 'd0liver'
+			done null, profile
+		else
+			done null, false, message: 'Unauthorized user.'
 
 	passport.use new GitHubStrategy opts, verify
 
@@ -27,9 +29,10 @@ module.exports = co.wrap ({app, passport, db}) ->
 		, passport.authenticate 'github', scope
 
 	failureRedirect = '/'
+	failureFlash = true
 	app.get \
 		'/auth/github/callback',
-		passport.authenticate('github', {failureRedirect}),
+		passport.authenticate('github', {failureRedirect, failureFlash}),
 		(req, res) ->
 			# Successful authentication, return to page (or home).
 			redir = if req.session.return
@@ -39,4 +42,3 @@ module.exports = co.wrap ({app, passport, db}) ->
 			delete req.session.return
 
 			res.redirect redir
-

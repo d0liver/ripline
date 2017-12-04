@@ -18,7 +18,7 @@ CredentialsManager = ->
 					contents = yield readFile '.dev_credentials', 'utf8'
 					creds = JSON.parse(contents)[key]
 					_.extendOwn creds, 
-						callbackURL: 'http://localhost:8080/auth/google/callback'
+						callbackURL: 'http://localhost:3000/auth/google/callback'
 				catch err
 					console.log "Unusable development oauth credentials for Google."
 

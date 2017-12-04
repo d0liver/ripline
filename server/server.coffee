@@ -1,3 +1,4 @@
+
 # Node
 {Server} = require 'http'
 fs       = require 'fs'
@@ -26,7 +27,6 @@ MONGODB_URI ?= 'mongodb://localhost:27017/ripline'
 
 # Local Dependencies
 SchemaBuilder      = require './schema'
-configGoogleAuth   = require './configGoogleAuth'
 configGitHubAuth   = require './configGitHubAuth'
 
 # Express Middleware and Initialization
@@ -64,9 +64,14 @@ co ->
 	db = yield MongoClient.connect MONGODB_URI
 	snippets = db.collection 'snippets'
 
-	# Disabled, maybe forever. Auth with github is more desirable.
-	# configGoogleAuth {app, db, passport}
 	configGitHubAuth {app, db, passport}
+
+	app.use '/', (req, res, next) ->
+		unless req.isAuthenticated() or
+		/\/auth\/github(\/callback)?/.test req.url
+			res.redirect '/auth/github'
+			return
+		next()
 
 	app.use '/graphql', graphqlExpress (req) ->
 		obj = schema: SchemaBuilder {db, user: req.user}
